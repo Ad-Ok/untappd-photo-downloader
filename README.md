@@ -1,101 +1,101 @@
-# Untappd Photo Scraper
+# Untappd Photo Downloader
 
-Скрипт для скачивания фотографий пользователя с Untappd.com с помощью Selenium.
+A script to download user photos from Untappd.com using Selenium.
 
-## ⚠️ Предупреждение
+## ⚠️ Warning
 
-Этот скрипт предназначен **только для личного использования**. Используйте ответственно:
+This script is intended **for personal use only**. Use responsibly:
 
-- Используйте только для сохранения собственных фотографий
-- Уважайте приватность других пользователей
-- Соблюдайте Terms of Service Untappd
+- Use only to save your own photos
+- Respect the privacy of other users
+- Follow Untappd's Terms of Service
 
-## Возможности
+## Features
 
-- ✅ Автоматическая загрузка всех фотографий пользователя
-- ✅ Скачивание оригинальных фотографий (не обрезанных)
-- ✅ Автоматическое нажатие кнопки "Show More" для загрузки всех фото
-- ✅ Ручная авторизация для обхода CAPTCHA
-- ✅ Пропуск уже скачанных файлов
-- ✅ Фильтрация логотипов пива и пивоварен
+- ✅ Automatic download of all user photos
+- ✅ Download original (uncropped) photos
+- ✅ Automatic "Show More" button clicking to load all photos
+- ✅ Manual login to bypass CAPTCHA
+- ✅ Skip already downloaded files
+- ✅ Filter out beer and brewery logos
 
-## Установка
+## Installation
 
-### Предварительные требования
+### Prerequisites
 
 - Python 3.7+
-- Google Chrome браузер
+- Google Chrome browser
 
-### Установка зависимостей
+### Install Dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-## Настройка
+## Configuration
 
-1. Создайте файл `creds.txt` в корневой папке проекта:
+1. Create a `creds.txt` file in the project root:
 
 ```
 your.email@example.com
 yourpassword
 ```
 
-**Первая строка** - ваш email на Untappd  
-**Вторая строка** - ваш пароль
+**First line** - your Untappd email  
+**Second line** - your password
 
-2. В файле `scraper.py` измените `target_user` на нужное имя пользователя:
+2. In `scraper.py`, change `target_user` to the desired username:
 
 ```python
-target_user = "your_username"  # Измените на нужное
+target_user = "your_username"  # Change as needed
 ```
 
-## Использование
+## Usage
 
-1. Запустите скрипт:
+1. Run the script:
 
 ```bash
 python scraper.py
 ```
 
-2. Откроется браузер Chrome
+2. Chrome browser will open
 
-3. Авторизуйтесь вручную на Untappd и пройдите CAPTCHA (если есть)
+3. Manually log in to Untappd and pass CAPTCHA (if present)
 
-4. После успешной авторизации нажмите **Enter** в терминале
+4. After successful login, press **Enter** in the terminal
 
-5. Скрипт автоматически:
-   - Загрузит все фотографии (кликая "Show More")
-   - Скачает оригинальные фотографии
-   - Сохранит их в `photos_{username}/`
+5. The script will automatically:
+   - Load all photos (clicking "Show More")
+   - Download original photos
+   - Save them to `photos_{username}/`
 
-## Настройки
+## Settings
 
-В функции `main()` файла `scraper.py` можно изменить:
+In the `main()` function of `scraper.py` you can modify:
 
-- `target_user` - имя пользователя для скачивания фото
-- `delay=2.0` - задержка между запросами (в секундах)
-- `output_dir` - папка для сохранения фото
+- `target_user` - username to download photos from
+- `delay=2.0` - delay between requests (in seconds)
+- `output_dir` - folder to save photos
 
-## Технические детали
+## Technical Details
 
-Скрипт использует:
-- **Selenium WebDriver** - для автоматизации браузера и загрузки динамического контента
-- **BeautifulSoup** - для парсинга HTML и извлечения `photoJSON`
-- **Requests** - для скачивания файлов
-- **WebDriver Manager** - для автоматической установки ChromeDriver
+The script uses:
+- **Selenium WebDriver** - for browser automation and dynamic content loading
+- **BeautifulSoup** - for HTML parsing and extracting `photoJSON`
+- **Requests** - for downloading files
+- **WebDriver Manager** - for automatic ChromeDriver installation
 
-Скрипт извлекает URL оригинальных фотографий из `<div id="photoJSON_*">`, который содержит JSON с `photo.photo_img_og`.
+The script extracts original photo URLs from `<div id="photoJSON_*">`, which contains JSON with `photo.photo_img_og`.
 
-## Структура проекта
+## Project Structure
 
 ```
 untappd/
-├── creds.txt          # Учетные данные (не коммитить!)
-├── scraper.py         # Основной скрипт
-├── requirements.txt   # Зависимости Python
-├── .gitignore         # Git ignore файлы
-└── README.md          # Документация
+├── creds.txt          # Credentials (don't commit!)
+├── scraper.py         # Main script
+├── requirements.txt   # Python dependencies
+├── .gitignore         # Git ignore files
+└── README.md          # Documentation
 ```
 
 ## License

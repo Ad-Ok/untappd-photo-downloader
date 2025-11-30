@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-Untappd Photo Scraper
-Скрипт для скачивания фотографий пользователя с Untappd.com
+Untappd Photo Downloader
+Script for downloading user photos from Untappd.com
 
-ВНИМАНИЕ: Используйте только для личных целей и соблюдайте ToS Untappd.
+WARNING: Use only for personal purposes and respect Untappd's ToS.
 """
 
 import os
@@ -24,19 +24,19 @@ from selenium.webdriver.chrome.service import Service
 
 
 class UntappdPhotoScraper:
-    """Класс для скрейпинга фотографий с Untappd"""
+    """Class for scraping photos from Untappd"""
     
     BASE_URL = "https://untappd.com"
     LOGIN_URL = f"{BASE_URL}/login"
     
     def __init__(self, username: str, password: str, delay: float = 2.0):
         """
-        Инициализация скрейпера
+        Initialize scraper
         
         Args:
-            username: Email для авторизации
-            password: Пароль
-            delay: Задержка между запросами в секундах (для вежливости)
+            username: Email for authentication
+            password: Password
+            delay: Delay between requests in seconds (for politeness)
         """
         self.username = username
         self.password = password
@@ -49,72 +49,72 @@ class UntappdPhotoScraper:
     
     def get_user_photos(self, target_username: str, max_photos: Optional[int] = None) -> List[Dict]:
         """
-        Получение списка фотографий пользователя с использованием Selenium
+        Get list of user photos using Selenium
         
         Args:
-            target_username: Имя пользователя Untappd
-            max_photos: Максимальное количество фото (None = все)
+            target_username: Untappd username
+            max_photos: Maximum number of photos (None = all)
             
         Returns:
-            Список словарей с информацией о фотографиях
+            List of dictionaries with photo information
         """
-        print(f"📸 Получение фотографий пользователя '{target_username}'...")
+        print(f"📸 Getting photos for user '{target_username}'...")
         
-        # Инициализация Selenium WebDriver
+        # Initialize Selenium WebDriver
         self._init_driver()
         
         try:
-            # Переходим на страницу логина
-            print("🔐 Откроется браузер - авторизуйтесь вручную и пройдите капчу")
+            # Go to login page
+            print("🔐 Browser will open - log in manually and pass CAPTCHA")
             self.driver.get(self.LOGIN_URL)
             
-            # Ждём, пока пользователь авторизуется вручную
-            print("⏳ Ожидание авторизации... (после входа нажмите Enter в терминале)")
-            input("Нажмите Enter после успешной авторизации: ")
+            # Wait for user to log in manually
+            print("⏳ Waiting for login... (press Enter in terminal after logging in)")
+            input("Press Enter after successful login: ")
             
-            # Переходим на страницу фотографий
+            # Go to photos page
             url = f"{self.BASE_URL}/user/{target_username}/photos"
             self.driver.get(url)
             time.sleep(3)
             
-            # Собираем все фото, кликая "Show More"
+            # Collect all photos by clicking "Show More"
             photos = self._load_all_photos(target_username, max_photos)
             
-            print(f"✅ Всего найдено фотографий: {len(photos)}")
+            print(f"✅ Total photos found: {len(photos)}")
             return photos
             
         finally:
-            # Закрываем браузер
+            # Close browser
             if self.driver:
                 self.driver.quit()
                 self.driver = None
     
     def _init_driver(self):
-        """Инициализация Selenium WebDriver"""
-        print("🌐 Запуск браузера...")
+        """Initialize Selenium WebDriver"""
+        print("🌐 Starting browser...")
         options = webdriver.ChromeOptions()
-        # Браузер будет видимым для ручной авторизации
+        # Browser will be visible for manual login
         options.add_argument('--no-sandbox')
         options.add_argument('--disable-dev-shm-usage')
         options.add_argument('--user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36')
         
-        # Используем webdriver-manager для автоматической установки ChromeDriver
+        # Use webdriver-manager for automatic ChromeDriver installation
         service = Service(ChromeDriverManager().install())
         self.driver = webdriver.Chrome(service=service, options=options)
     
     def _load_all_photos(self, username: str, max_photos: Optional[int] = None) -> List[Dict]:
-        """Загрузка всех фотографий, кликая кнопку Show More"""
+        """Load all photos by clicking Show More button"""
         all_photos = []
         seen_photo_ids: Set[str] = set()
         load_more_attempts = 0
-        max_attempts = 100  # Защита от бесконечного цикла
+        max_attempts = 100  # Protection against infinite loop
         
         while load_more_attempts < max_attempts:
-            # Парсим текущую страницу
+            # Parse current page
             soup = BeautifulSoup(self.driver.page_source, 'html.parser')
             photo_items = soup.find_all('a', class_='photo-item')
             
-            # Извлекаем новые фото
+            # Extract new photos
             new_photos = 0
             for item in photo_items:
                 photo_id = item.get('data-photo-id')
@@ -122,7 +122,7 @@ class UntappdPhotoScraper:
                 if photo_id and photo_id not in seen_photo_ids:
                     seen_photo_ids.add(photo_id)
                     
-                    # Ищем div с photoJSON
+                    # Find div with photoJSON
                     photo_json_div = item.find('div', id=re.compile(r'^photoJSON_'))
                     if photo_json_div and photo_json_div.string:
                         try:
@@ -132,7 +132,7 @@ class UntappdPhotoScraper:
                             if photo_img_og:
                                 img_url = photo_img_og.replace(r'\/', '/')
                                 
-                                # Пропускаем логотипы
+                                # Skip logos
                                 if 'beer_logos' in img_url or 'brewery_logos' in img_url:
                                     continue
                                 
@@ -144,20 +144,20 @@ class UntappdPhotoScraper:
                         except (json.JSONDecodeError, AttributeError):
                             continue
             
-            print(f"  Загружено фотографий: {len(all_photos)} (+{new_photos} новых)")
+            print(f"  Loaded photos: {len(all_photos)} (+{new_photos} new)")
             
-            # Проверяем лимит
+            # Check limit
             if max_photos and len(all_photos) >= max_photos:
                 return all_photos[:max_photos]
             
-            # Ищем кнопку "Show More" с разными селекторами
+            # Look for "Show More" button with different selectors
             show_more_found = False
             try:
-                # Прокручиваем вниз страницы
+                # Scroll to bottom of page
                 self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
                 time.sleep(1)
                 
-                # Пробуем разные селекторы для кнопки
+                # Try different selectors for the button
                 selectors = [
                     "a.more_photos",
                     "a.yellow.button.more_photos",
@@ -169,14 +169,14 @@ class UntappdPhotoScraper:
                     try:
                         show_more_button = self.driver.find_element(By.CSS_SELECTOR, selector)
                         
-                        # Проверяем, видна ли кнопка
+                        # Check if button is visible
                         if show_more_button.is_displayed() and show_more_button.is_enabled():
-                            print(f"  Кликаем 'Show More' (селектор: {selector})...")
-                            # Используем JavaScript для клика, чтобы избежать проблем с перекрытием
+                            print(f"  Clicking 'Show More' (selector: {selector})...")
+                            # Use JavaScript to click to avoid overlay issues
                             self.driver.execute_script("arguments[0].click();", show_more_button)
                             show_more_found = True
                             
-                            # Ждём загрузки новых фото (5 секунд)
+                            # Wait for new photos to load (5 seconds)
                             time.sleep(5)
                             load_more_attempts += 1
                             break
@@ -184,41 +184,41 @@ class UntappdPhotoScraper:
                         continue
                 
                 if not show_more_found:
-                    print("  Кнопка 'Show More' не найдена или не видна - все фото загружены")
+                    print("  'Show More' button not found or not visible - all photos loaded")
                     break
                     
             except Exception as e:
-                print(f"  Ошибка при поиске кнопки: {e}")
+                print(f"  Error searching for button: {e}")
                 break
         
         return all_photos
     
     def download_photos(self, photos: List[Dict], output_dir: str = "photos") -> None:
         """
-        Скачивание фотографий
+        Download photos
         
         Args:
-            photos: Список фотографий из get_user_photos()
-            output_dir: Директория для сохранения
+            photos: List of photos from get_user_photos()
+            output_dir: Directory for saving photos
         """
         output_path = Path(output_dir)
         output_path.mkdir(exist_ok=True)
         
-        print(f"\n💾 Скачивание {len(photos)} фотографий в '{output_dir}'...")
+        print(f"\n💾 Downloading {len(photos)} photos to '{output_dir}'...")
         
         for idx, photo in enumerate(photos, 1):
             try:
-                # Формируем имя файла
+                # Format filename
                 filename = f"photo_{idx:04d}.jpg"
                 filepath = output_path / filename
                 
-                # Проверяем, не скачан ли уже файл
+                # Check if file already exists
                 if filepath.exists():
-                    print(f"  [{idx}/{len(photos)}] Пропуск (уже существует): {filename}")
+                    print(f"  [{idx}/{len(photos)}] Skipping (already exists): {filename}")
                     continue
                 
-                # Скачиваем
-                print(f"  [{idx}/{len(photos)}] Скачивание: {filename}")
+                # Download
+                print(f"  [{idx}/{len(photos)}] Downloading: {filename}")
                 response = self.session.get(photo['url'], stream=True)
                 response.raise_for_status()
                 
@@ -229,22 +229,22 @@ class UntappdPhotoScraper:
                 time.sleep(self.delay)
                 
             except Exception as e:
-                print(f"  ❌ Ошибка скачивания фото {idx}: {e}")
+                print(f"  ❌ Download error for photo {idx}: {e}")
                 continue
         
-        print(f"\n✅ Готово! Фотографии сохранены в '{output_dir}'")
+        print(f"\n✅ Done! Photos saved to '{output_dir}'")
 
 
 def load_credentials(creds_file: str = "creds.txt") -> tuple:
-    """Загрузка учетных данных из файла"""
+    """Load credentials from file"""
     if not os.path.exists(creds_file):
-        raise FileNotFoundError(f"Файл '{creds_file}' не найден. Создайте файл с email и паролем.")
+        raise FileNotFoundError(f"File '{creds_file}' not found. Create file with email and password.")
     
     with open(creds_file, 'r', encoding='utf-8') as f:
         lines = [line.strip() for line in f.readlines() if line.strip()]
     
     if len(lines) < 2:
-        raise ValueError("Файл creds.txt должен содержать 2 строки: email и пароль")
+        raise ValueError("File creds.txt must contain 2 lines: email and password")
     
     email = lines[0]
     password = lines[1]
@@ -253,35 +253,35 @@ def load_credentials(creds_file: str = "creds.txt") -> tuple:
 
 
 def main():
-    """Основная функция"""
+    """Main function"""
     print("=" * 60)
     print("Untappd Photo Scraper")
     print("=" * 60)
     
     try:
-        # Загружаем учетные данные
+        # Load credentials
         email, password = load_credentials()
         
-        # Создаем скрейпер
+        # Create scraper
         scraper = UntappdPhotoScraper(email, password, delay=2.0)
         
-        # Целевой пользователь (можно изменить здесь или в creds.txt)
+        # Target user (can be changed here or in creds.txt)
         target_user = "goosinsky"
         
-        # Получаем список фотографий (с ручной авторизацией в браузере)
+        # Get list of photos (with manual browser login)
         photos = scraper.get_user_photos(target_user)
         
         if not photos:
-            print("❌ Фотографии не найдены")
+            print("❌ No photos found")
             return
         
-        # Скачиваем фотографии
+        # Download photos
         scraper.download_photos(photos, output_dir=f"photos_{target_user}")
         
     except KeyboardInterrupt:
-        print("\n\n⚠️  Прервано пользователем")
+        print("\n\n⚠️  Interrupted by user")
     except Exception as e:
-        print(f"\n❌ Ошибка: {e}")
+        print(f"\n❌ Error: {e}")
         import traceback
         traceback.print_exc()
 
