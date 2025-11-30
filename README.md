@@ -34,10 +34,10 @@ pip install -r requirements.txt
 
 ## Usage
 
-1. In `scraper.py`, change `target_user` to the desired username:
+1. In `scraper.py`, set the target username:
 
 ```python
-target_user = "your_username"  # Change as needed
+target_user = "username_here"  # Change to the user whose photos you want to download
 ```
 
 2. Run the script:

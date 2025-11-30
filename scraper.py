@@ -29,17 +29,13 @@ class UntappdPhotoScraper:
     BASE_URL = "https://untappd.com"
     LOGIN_URL = f"{BASE_URL}/login"
     
-    def __init__(self, username: str, password: str, delay: float = 2.0):
+    def __init__(self, delay: float = 2.0):
         """
         Initialize scraper
         
         Args:
-            username: Email for authentication
-            password: Password
             delay: Delay between requests in seconds (for politeness)
         """
-        self.username = username
-        self.password = password
         self.delay = delay
         self.session = requests.Session()
         self.session.headers.update({
@@ -235,23 +231,6 @@ class UntappdPhotoScraper:
         print(f"\n✅ Done! Photos saved to '{output_dir}'")
 
 
-def load_credentials(creds_file: str = "creds.txt") -> tuple:
-    """Load credentials from file"""
-    if not os.path.exists(creds_file):
-        raise FileNotFoundError(f"File '{creds_file}' not found. Create file with email and password.")
-    
-    with open(creds_file, 'r', encoding='utf-8') as f:
-        lines = [line.strip() for line in f.readlines() if line.strip()]
-    
-    if len(lines) < 2:
-        raise ValueError("File creds.txt must contain 2 lines: email and password")
-    
-    email = lines[0]
-    password = lines[1]
-    
-    return email, password
-
-
 def main():
     """Main function"""
     print("=" * 60)
@@ -259,13 +238,10 @@ def main():
     print("=" * 60)
     
     try:
-        # Load credentials
-        email, password = load_credentials()
-        
         # Create scraper
-        scraper = UntappdPhotoScraper(email, password, delay=2.0)
+        scraper = UntappdPhotoScraper(delay=2.0)
         
-        # Target user (can be changed here or in creds.txt)
+        # Target user
         target_user = "goosinsky"
         
         # Get list of photos (with manual browser login)
