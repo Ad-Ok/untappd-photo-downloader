@@ -34,35 +34,25 @@ pip install -r requirements.txt
 
 ## Usage
 
-1. Create a `creds.txt` file in the project root:
-
-```
-your.email@example.com
-yourpassword
-```
-
-**First line** - your Untappd email  
-**Second line** - your password
-
-2. In `scraper.py`, change `target_user` to the desired username:
+1. In `scraper.py`, change `target_user` to the desired username:
 
 ```python
 target_user = "your_username"  # Change as needed
 ```
 
-3. Run the script:
+2. Run the script:
 
 ```bash
 python scraper.py
 ```
 
-4. Chrome browser will open
+3. Chrome browser will open
 
-5. Manually log in to Untappd and pass CAPTCHA (if present)
+4. Manually log in to Untappd and pass CAPTCHA (if present)
 
-6. After successful login, press **Enter** in the terminal
+5. After successful login, press **Enter** in the terminal
 
-7. The script will automatically:
+6. The script will automatically:
    - Load all photos (clicking "Show More")
    - Download original photos
    - Save them to `photos_{username}/`
