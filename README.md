@@ -32,7 +32,7 @@ This script is intended **for personal use only**. Use responsibly:
 pip install -r requirements.txt
 ```
 
-## Configuration
+## Usage
 
 1. Create a `creds.txt` file in the project root:
 
@@ -50,21 +50,19 @@ yourpassword
 target_user = "your_username"  # Change as needed
 ```
 
-## Usage
-
-1. Run the script:
+3. Run the script:
 
 ```bash
 python scraper.py
 ```
 
-2. Chrome browser will open
+4. Chrome browser will open
 
-3. Manually log in to Untappd and pass CAPTCHA (if present)
+5. Manually log in to Untappd and pass CAPTCHA (if present)
 
-4. After successful login, press **Enter** in the terminal
+6. After successful login, press **Enter** in the terminal
 
-5. The script will automatically:
+7. The script will automatically:
    - Load all photos (clicking "Show More")
    - Download original photos
    - Save them to `photos_{username}/`
